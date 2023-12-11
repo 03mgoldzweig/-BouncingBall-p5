@@ -5,7 +5,7 @@
  * Evan Peck's example at
  * https://editor.p5js.org/evanpeck/sketches/O7MjzPFxb
  * 
- * Edward Talmage
+ * Edward Talmage and Max Goldzweig
  * 2023-11-27
  *
  * Revisions
@@ -78,16 +78,22 @@ function draw() {
   
   testBallMove();  // a special ball to test corner collision
   
-  for (var ballNum = 0; ballNum < balls.length; ballNum++) {
-    balls[ballNum].display();
-    balls[ballNum].checkForHitWall();
-    balls[ballNum].checkForHitBox();
-    balls[ballNum].moveBall();
+  
     
-//    if (mouseIsPressed) {
-//      balls[ballNum].randomize()
-//    }
+  for (var i = 0; i < balls.length; i++) {
+    for (var j = i + 1; j < balls.length; j++) {
+      // Check for collision between balls
+      if (balls[i].collidesWith(balls[j])) {
+        balls[i].animateCollision();
+        balls[j].animateCollision();
+      }
+    }
+    balls[i].display();
+    balls[i].checkForHitWall();
+    balls[i].checkForHitBox();
+    balls[i].moveBall();
   }
+  
 }
 
 function mouseClicked() {  
@@ -125,6 +131,7 @@ class Ball { // Constructor
     this.red   = random(255);
     this.green = random(255);
     this.blue  = random(255)
+    
   }
   
   display() {
@@ -174,5 +181,28 @@ class Ball { // Constructor
     this.ballX += this.speedX;
   	this.ballY += this.speedY;
   }
+  
+  collidesWith(otherBall) {
+    
+    let distance = dist(this.ballX, this.ballY, otherBall.ballX, otherBall.ballY);
+    let minDist = (this.size + otherBall.size ) / 2;
+    if (distance < minDist && random() < 1 / 75)  {
+      this.reverseBall();
+      otherBall.reverseBall();
+      return distance < minDist;
+    }
+    
+  }
+
+  animateCollision() {
+    this.red = random(255);
+    this.green = random(255);
+    this.blue = random(255);
+    
+    this.speedX = random(-5, 5);
+    this.speedY = random(-5, 5);
+  }
+  
+  
   
 }
